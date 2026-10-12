@@ -34,6 +34,7 @@ test('식단·공복 체중 기록 저장 및 CSV 내보내기 기능 표시', a
   await page.locator('#start').fill('2026-10-12');
   await page.locator('#goal-form button[type="submit"]').click();
 
+  page.on('dialog', dialog => dialog.accept());
   await page.locator('#log-date').fill('2026-10-12');
   await page.locator('#fasting-weight').fill('52.2');
   await page.locator('#breakfast').fill('자동 테스트 계란');
