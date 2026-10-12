@@ -1,0 +1,12 @@
+{
+  "name": "life-os-goal",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "check:js": "node --check app.js && node --check health.js",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
