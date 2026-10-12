@@ -1,8 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => localStorage.clear());
   await page.goto('/');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
 });
 
 test('앱 시작 화면과 목표 생성 폼 표시', async ({ page }) => {
@@ -20,12 +21,13 @@ test('목표를 생성하고 오늘 체크를 새로고침 후 유지', async ({
 
   const card = page.locator('.goal-card').filter({ hasText: '자동 테스트 목표' });
   await expect(card).toBeVisible();
-  await card.locator('[data-check]').click();
-  await expect(card.locator('[data-check]')).toHaveClass(/done/);
+  await card.locator('button[data-check]').click();
+  await expect(card.locator('button[data-check]')).toHaveClass(/done/);
   await page.reload();
 
   const reloaded = page.locator('.goal-card').filter({ hasText: '자동 테스트 목표' });
-  await expect(reloaded.locator('[data-check]')).toHaveClass(/done/);
+  await expect(reloaded).toBeVisible();
+  await expect(reloaded.locator('button[data-check]')).toHaveClass(/done/);
 });
 
 test('식단·공복 체중 기록 저장 및 CSV 내보내기 기능 표시', async ({ page }) => {
