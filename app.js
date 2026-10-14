@@ -1,12 +1,14 @@
 (() => {
 "use strict";
-const KEY="life-os-goal-mvp-v1", $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const KEY="daily-fit-app-mvp-v1", LEGACY_KEY="life-os-goal-mvp-v1", $=s=>document.querySelector(s), $=s=>[...document.querySelectorAll(s)];
+function readGoals(key){try{const v=JSON.parse(localStorage.getItem(key)||"null");return v&&Array.isArray(v.goals)?v:null}catch(e){return null}}
+function loadState(){const current=readGoals(KEY),legacy=readGoals(LEGACY_KEY);if(!current&&!legacy)return {goals:[]};if(!legacy)return current;if(!current){try{localStorage.setItem(KEY,JSON.stringify(legacy))}catch(e){}return legacy}const merged=new Map();legacy.goals.forEach(g=>merged.set(String(g.id),g));current.goals.forEach(g=>merged.set(String(g.id),g));const state={...legacy,...current,goals:[...merged.values()]};try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}return state}
 const names={diet:"식단 관리",exercise:"운동 습관",wellness:"건강한 생활",custom:"나만의 목표"}, icons={diet:"🥗",exercise:"🏃",wellness:"☀️",custom:"✦"};
 const rec={diet:[["단백질 챙겨 먹기","오늘 단백질 식품 한 끼 챙기기"],["채소 한 접시 먹기","한 끼에 채소 한 접시 곁들이기"],["식사 기록하기","먹은 음식을 하루 한 번 기록하기"]],exercise:[["하루 20분 움직이기","내 몸에 맞게 20분 걷거나 운동하기"],["매일 산책하기","집 밖에서 10분 이상 걷기"],["짧은 근력 운동","스쿼트 등 간단한 동작 10회 하기"]],wellness:[["물 자주 마시기","물 한 잔을 의식적으로 5번 마시기"],["수면 루틴 만들기","잠들기 20분 전 휴대폰 내려놓기"],["나를 위한 시간","오늘 10분은 나를 위해 쉬기"]],custom:[["나만의 작은 습관","매일 10분씩 목표 행동 실천하기"]]};
 const praise=["첫걸음을 내디뎠어요. 시작했다는 사실만으로도 충분히 멋져요!","작은 성공이 쌓이고 있어요. 지금의 리듬을 이어가 봐요.","꾸준함이 보이기 시작해요. 스스로를 칭찬해 주세요.","여기까지 온 건 우연이 아니에요. 행동으로 증명하고 있어요.","목표의 중간 지점을 향해 가고 있어요. 정말 잘하고 있어요!","습관이 조금씩 자리를 잡고 있어요. 어제보다 한 걸음 성장했어요.","쉽지 않은 날에도 다시 돌아온 자신을 인정해 주세요.","거의 다 왔어요. 지금까지의 노력이 멋진 기록이 되고 있어요.","마지막 구간이에요! 완벽하지 않아도 계속 나아가면 돼요.","목표 달성! 해냈어요. 오늘의 성취를 마음껏 축하해 주세요!"];
 const milestones=days=>{if(days===30)return[1,3,6,9,12,16,20,24,27,30];const ratios=[.03,.1,.2,.3,.4,.53,.67,.8,.9,1],out=[];let prev=0;ratios.forEach((r,i)=>{let n=i===9?days:Math.round(days*r);n=Math.min(days-(9-i),Math.max(prev+1,n,1));out.push(n);prev=n});return out};
 const date=()=>{let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
-let state;try{state=JSON.parse(localStorage.getItem(KEY)||'{"goals":[]}');if(!Array.isArray(state.goals))state={goals:[]}}catch(e){state={goals:[]}}let mode="auto",timer;
+let state=loadState();let mode="auto",timer;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){toast("저장에 문제가 있어요. 브라우저 설정을 확인해 주세요.")}};
 function toast(s){$("#toast").textContent=s;$("#toast").classList.add("show");clearTimeout(timer);timer=setTimeout(()=>$("#toast").classList.remove("show"),2400)}
