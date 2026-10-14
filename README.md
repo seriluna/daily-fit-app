@@ -1,4 +1,4 @@
-# 한 걸음 | life-os-goal
+# 한 걸음 | Daily Fit App
 
 작은 행동을 기록하고 목표를 10단계로 나누어 성취감을 쌓는 다이어트·운동 습관 관리 웹 MVP입니다.
 
@@ -12,7 +12,7 @@
 - 모바일 반응형 웹 화면
 
 ## 실행 및 배포
-빌드 도구 없이 `index.html`을 브라우저에서 열 수 있습니다. 공개 주소를 만들려면 저장소의 **Settings → Pages**에서 배포 소스를 설정하세요. 배포 후 URL은 보통 `https://seriluna.github.io/life-os-goal/` 형식입니다.
+빌드 도구 없이 `index.html`을 브라우저에서 열 수 있습니다. 공개 주소를 만들려면 저장소의 **Settings → Pages**에서 배포 소스를 설정하세요. GitHub Pages 주소는 `https://seriluna.github.io/daily-fit-app/` 입니다.
 
 ## MVP의 제한
 - 기록은 현재 브라우저의 `localStorage`에 저장되며 계정·서버·기기 간 동기화는 없습니다.
