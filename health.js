@@ -1,10 +1,11 @@
 (() => {
 "use strict";
-const KEY="life-os-health-log-v1";
+const KEY="daily-fit-app-health-log-v1", LEGACY_KEY="life-os-health-log-v1";
 const $=s=>document.querySelector(s);
 const dateNow=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
-let records={};
-try{records=JSON.parse(localStorage.getItem(KEY)||"{}");if(!records||typeof records!=="object"||Array.isArray(records))records={}}catch(e){records={}}
+function readRecords(key){try{const v=JSON.parse(localStorage.getItem(key)||"null");return v&&typeof v==="object"&&!Array.isArray(v)?v:null}catch(e){return null}}
+function loadRecords(){const current=readRecords(KEY),legacy=readRecords(LEGACY_KEY);if(!current&&!legacy)return {};if(!legacy)return current;if(!current){try{localStorage.setItem(KEY,JSON.stringify(legacy))}catch(e){}return legacy}const merged={...legacy,...current};try{localStorage.setItem(KEY,JSON.stringify(merged))}catch(e){}return merged}
+let records=loadRecords();
 const fields=["fastingWeight","breakfast","bKcal","bCarb","bProtein","bFat","lunch","lKcal","lCarb","lProtein","lFat","dinner","dKcal","dCarb","dProtein","dFat","note"];
 const numeric=new Set(["fastingWeight","bKcal","bCarb","bProtein","bFat","lKcal","lCarb","lProtein","lFat","dKcal","dCarb","dProtein","dFat"]);
 const ids={"fastingWeight":"fasting-weight","breakfast":"breakfast","bKcal":"b-kcal","bCarb":"b-carb","bProtein":"b-protein","bFat":"b-fat","lunch":"lunch","lKcal":"l-kcal","lCarb":"l-carb","lProtein":"l-protein","lFat":"l-fat","dinner":"dinner","dKcal":"d-kcal","dCarb":"d-carb","dProtein":"d-protein","dFat":"d-fat","note":"health-note"};
@@ -17,5 +18,5 @@ $("#log-date").value=dateNow();fill(dateNow());render();
 $("#log-date").addEventListener("change",e=>fill(e.target.value));
 $("#health-form").addEventListener("submit",e=>{e.preventDefault();const d=$("#log-date").value;if(!d)return;const r={date:d};fields.forEach(k=>r[k]=val(k));if(Object.values(r).every(v=>v===""||v===d))return alert("몸무게나 식단 중 하나 이상 입력해 주세요.");records[d]=r;save();render();alert("기록을 저장했어요.");});
 $("#health-records").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.load){$("#log-date").value=b.dataset.load;fill(b.dataset.load);$("#health-form").scrollIntoView({behavior:"smooth",block:"start"})}if(b.dataset.remove&&confirm(b.dataset.remove+" 기록을 삭제할까요?")){delete records[b.dataset.remove];save();render();if($("#log-date").value===b.dataset.remove)fill(b.dataset.remove)}});
-$("#export-health").addEventListener("click",()=>{const headers=["날짜","공복 몸무게(kg)","아침 식단","아침 kcal","아침 탄수화물(g)","아침 단백질(g)","아침 지방(g)","점심 식단","점심 kcal","점심 탄수화물(g)","점심 단백질(g)","점심 지방(g)","저녁 식단","저녁 kcal","저녁 탄수화물(g)","저녁 단백질(g)","저녁 지방(g)","메모"];const keys=["date","fastingWeight","breakfast","bKcal","bCarb","bProtein","bFat","lunch","lKcal","lCarb","lProtein","lFat","dinner","dKcal","dCarb","dProtein","dFat","note"];const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const rows=[headers,...Object.keys(records).sort().map(d=>keys.map(k=>records[d][k]??""))].map(row=>row.map(q).join(",")).join("\r\n");const blob=new Blob(["\uFEFF",rows],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="life-os-식단-공복몸무게-"+dateNow()+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);});
+$("#export-health").addEventListener("click",()=>{const headers=["날짜","공복 몸무게(kg)","아침 식단","아침 kcal","아침 탄수화물(g)","아침 단백질(g)","아침 지방(g)","점심 식단","점심 kcal","점심 탄수화물(g)","점심 단백질(g)","점심 지방(g)","저녁 식단","저녁 kcal","저녁 탄수화물(g)","저녁 단백질(g)","저녁 지방(g)","메모"];const keys=["date","fastingWeight","breakfast","bKcal","bCarb","bProtein","bFat","lunch","lKcal","lCarb","lProtein","lFat","dinner","dKcal","dCarb","dProtein","dFat","note"];const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const rows=[headers,...Object.keys(records).sort().map(d=>keys.map(k=>records[d][k]??""))].map(row=>row.map(q).join(",")).join("\r\n");const blob=new Blob(["\uFEFF",rows],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daily-fit-app-식단-공복몸무게-"+dateNow()+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);});
 })();
